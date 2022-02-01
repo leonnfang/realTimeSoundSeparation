@@ -117,6 +117,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named paex_record
+
+# Build rule for target.
+paex_record: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 paex_record
+.PHONY : paex_record
+
+# fast build rule for target.
+paex_record/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/build
+.PHONY : paex_record/fast
+
+#=============================================================================
 # Target rules for targets named realTimeSoundSeparation
 
 # Build rule for target.
@@ -128,6 +141,30 @@ realTimeSoundSeparation: cmake_check_build_system
 realTimeSoundSeparation/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/build
 .PHONY : realTimeSoundSeparation/fast
+
+examples/paex_record.o: examples/paex_record.c.o
+.PHONY : examples/paex_record.o
+
+# target to build an object file
+examples/paex_record.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/examples/paex_record.c.o
+.PHONY : examples/paex_record.c.o
+
+examples/paex_record.i: examples/paex_record.c.i
+.PHONY : examples/paex_record.i
+
+# target to preprocess a source file
+examples/paex_record.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/examples/paex_record.c.i
+.PHONY : examples/paex_record.c.i
+
+examples/paex_record.s: examples/paex_record.c.s
+.PHONY : examples/paex_record.s
+
+# target to generate assembly for a file
+examples/paex_record.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/examples/paex_record.c.s
+.PHONY : examples/paex_record.c.s
 
 main.o: main.cpp.o
 .PHONY : main.o
@@ -161,7 +198,11 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... paex_record"
 	@echo "... realTimeSoundSeparation"
+	@echo "... examples/paex_record.o"
+	@echo "... examples/paex_record.i"
+	@echo "... examples/paex_record.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
