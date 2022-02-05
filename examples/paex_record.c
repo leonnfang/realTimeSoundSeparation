@@ -53,7 +53,7 @@
 /* #define DITHER_FLAG     (paDitherOff) */
 #define DITHER_FLAG     (0) /**/
 /** Set to 1 if you want to capture the recording to a file. */
-#define WRITE_TO_FILE   (0)
+#define WRITE_TO_FILE   (1)
 
 /* Select sample format. */
 #if 1
@@ -231,7 +231,7 @@ int main(void)
         fprintf(stderr,"Error: No default input device.\n");
         goto done;
     }
-    inputParameters.channelCount = 2;                    /* stereo input */
+    inputParameters.channelCount = 1;                    /* stereo input */
     inputParameters.sampleFormat = PA_SAMPLE_TYPE;
     inputParameters.suggestedLatency = Pa_GetDeviceInfo( inputParameters.device )->defaultLowInputLatency;
     inputParameters.hostApiSpecificStreamInfo = NULL;
