@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
   "CMakeFiles/realTimeSoundSeparation.dir/main.cpp.o"
+  "CMakeFiles/realTimeSoundSeparation.dir/src/record.cpp.o"
   "realTimeSoundSeparation"
   "realTimeSoundSeparation.pdb"
 )

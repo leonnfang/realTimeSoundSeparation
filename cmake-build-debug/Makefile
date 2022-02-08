@@ -190,6 +190,33 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/record.o: src/record.cpp.o
+.PHONY : src/record.o
+
+# target to build an object file
+src/record.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/src/record.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/src/record.cpp.o
+.PHONY : src/record.cpp.o
+
+src/record.i: src/record.cpp.i
+.PHONY : src/record.i
+
+# target to preprocess a source file
+src/record.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/src/record.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/src/record.cpp.i
+.PHONY : src/record.cpp.i
+
+src/record.s: src/record.cpp.s
+.PHONY : src/record.s
+
+# target to generate assembly for a file
+src/record.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/src/record.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/src/record.cpp.s
+.PHONY : src/record.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -206,6 +233,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/record.o"
+	@echo "... src/record.i"
+	@echo "... src/record.s"
 .PHONY : help
 
 

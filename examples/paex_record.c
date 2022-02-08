@@ -49,11 +49,11 @@
 #define SAMPLE_RATE  (44100)
 #define FRAMES_PER_BUFFER (512)
 #define NUM_SECONDS     (5)
-#define NUM_CHANNELS    (2)
+#define NUM_CHANNELS    (1)
 /* #define DITHER_FLAG     (paDitherOff) */
 #define DITHER_FLAG     (0) /**/
 /** Set to 1 if you want to capture the recording to a file. */
-#define WRITE_TO_FILE   (1)
+#define WRITE_TO_FILE   (0)
 
 /* Select sample format. */
 #if 1
@@ -195,8 +195,6 @@ static int playCallback( const void *inputBuffer, void *outputBuffer,
 int main(void);
 int main(void)
 {
-//    std::cout << "hellooooooooo" << std::endl;
-    printf("hello\n");
     PaStreamParameters  inputParameters,
                         outputParameters;
     PaStream*           stream;
@@ -268,7 +266,7 @@ int main(void)
     for( i=0; i<numSamples; i++ )
     {
         val = data.recordedSamples[i];
-        if( val < 0 ) val = -val; /* ABS */
+//        if( val < 0 ) val = -val; /* ABS */
         if( val > max )
         {
             max = val;
@@ -285,7 +283,7 @@ int main(void)
 #if WRITE_TO_FILE
     {
         FILE  *fid;
-        fid = fopen("recorded.raw", "wb");
+        fid = fopen("recorded.wav", "wb");
         if( fid == NULL )
         {
             printf("Could not open file.");
@@ -307,7 +305,7 @@ int main(void)
         fprintf(stderr,"Error: No default output device.\n");
         goto done;
     }
-    outputParameters.channelCount = 2;                     /* stereo output */
+    outputParameters.channelCount = NUM_CHANNELS;                     /* stereo output */
     outputParameters.sampleFormat =  PA_SAMPLE_TYPE;
     outputParameters.suggestedLatency = Pa_GetDeviceInfo( outputParameters.device )->defaultLowOutputLatency;
     outputParameters.hostApiSpecificStreamInfo = NULL;

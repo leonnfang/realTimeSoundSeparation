@@ -125,7 +125,15 @@
 		<Unit filename="/Users/leonfang/realTimeSoundSeparation/examples/paex_record.c">
 			<Option target="paex_record"/>
 		</Unit>
+		<Unit filename="/Users/leonfang/realTimeSoundSeparation/include/record.h">
+			<Option target="paex_record"/>
+			<Option target="realTimeSoundSeparation"/>
+		</Unit>
 		<Unit filename="/Users/leonfang/realTimeSoundSeparation/main.cpp">
+			<Option target="realTimeSoundSeparation"/>
+		</Unit>
+		<Unit filename="/Users/leonfang/realTimeSoundSeparation/src/record.cpp">
+			<Option target="paex_record"/>
 			<Option target="realTimeSoundSeparation"/>
 		</Unit>
 		<Unit filename="/Users/leonfang/realTimeSoundSeparation/CMakeLists.txt">
