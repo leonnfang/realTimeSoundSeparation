@@ -367,7 +367,7 @@ OceanWave* InitializeWave(double SR, float attackInSeconds, float maxLevel, floa
     static unsigned lastNoOfRows = 12;
     unsigned newNoOfRows;
 
-    wave = (OceanWave*)PaUtil_AllocateMemory(sizeof(OceanWave));
+    wave = (OceanWave*)malloc(sizeof(OceanWave));
     if (wave != NULL)
     {
         InitializePinkNoise(&wave->wave_left, lastNoOfRows);
@@ -407,14 +407,14 @@ int main(void)
     static const int    FPB = 128; /* Frames per buffer: 2.9 ms buffers. */
 
     /* Initialize communication buffers (queues) */
-    data.rBufToRTData = PaUtil_AllocateMemory(sizeof(OceanWave*) * 256);
+    data.rBufToRTData = malloc(sizeof(OceanWave*) * 256);
     if (data.rBufToRTData == NULL)
     {
         return 1;
     }
     PaUtil_InitializeRingBuffer(&data.rBufToRT, sizeof(OceanWave*), 256, data.rBufToRTData);
 
-    data.rBufFromRTData = PaUtil_AllocateMemory(sizeof(OceanWave*) * 256);
+    data.rBufFromRTData = malloc(sizeof(OceanWave*) * 256);
     if (data.rBufFromRTData == NULL)
     {
         return 1;
@@ -465,7 +465,7 @@ int main(void)
             if (ptr != 0)
             {
                 printf("Wave is deleted...\n");
-                PaUtil_FreeMemory(ptr);
+                free(ptr);
                 --data.noOfActiveWaves;
             }
         }
@@ -512,11 +512,11 @@ int main(void)
 
     if (data.rBufToRTData)
     {
-        PaUtil_FreeMemory(data.rBufToRTData);
+        free(data.rBufToRTData);
     }
     if (data.rBufFromRTData)
     {
-        PaUtil_FreeMemory(data.rBufFromRTData);
+        free(data.rBufFromRTData);
     }
 
     Pa_Sleep(1000);

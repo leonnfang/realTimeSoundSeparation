@@ -8,8 +8,18 @@ link_directories(/usr/local/lib)
 link_directories(src/common)
 add_executable(realTimeSoundSeparation main.cpp include/record.h src/record.cpp)
 add_executable(paex_record ./examples/paex_record.c include/record.h src/record.cpp)
-add_executable(ocean_shore ./examples/paex_ocean_shore.c include/pa_ringbuffer.h include/pa_util.h include/pa_memorybarrier.h include/pa_hostapi.h include/pa_stream.h
-        src/pa_mac_core.c src/pa_mac_core_blocking.c src/pa_mac_core_utilities.c src/pa_ringbuffer.c)
+add_executable(ocean_shore ./examples/paex_ocean_shore.c
+        include/pa_ringbuffer.h
+        include/pa_util.h
+        include/pa_memorybarrier.h
+        include/pa_hostapi.h
+        include/pa_stream.h
+        include/pa_mac_core.h
+        include/pa_mac_core_blocking.h
+        include/pa_mac_core_internal.h
+        include/pa_mac_core_utilities.h
+
+        src/pa_ringbuffer.c)
 #link_libraries(pa_audio portaudio/lib/.libs/libportaudio.a)
 target_link_libraries(realTimeSoundSeparation libportaudio.a)
 target_link_libraries(paex_record libportaudio.a)
