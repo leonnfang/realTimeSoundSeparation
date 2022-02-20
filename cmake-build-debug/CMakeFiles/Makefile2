@@ -63,6 +63,7 @@ CMAKE_BINARY_DIR = /Users/leonfang/realTimeSoundSeparation/cmake-build-debug
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
+all: CMakeFiles/ocean_shore.dir/all
 all: CMakeFiles/paex_record.dir/all
 all: CMakeFiles/realTimeSoundSeparation.dir/all
 .PHONY : all
@@ -72,9 +73,36 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
+clean: CMakeFiles/ocean_shore.dir/clean
 clean: CMakeFiles/paex_record.dir/clean
 clean: CMakeFiles/realTimeSoundSeparation.dir/clean
 .PHONY : clean
+
+#=============================================================================
+# Target rules for target CMakeFiles/ocean_shore.dir
+
+# All Build rule for target.
+CMakeFiles/ocean_shore.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/leonfang/realTimeSoundSeparation/cmake-build-debug/CMakeFiles --progress-num=1,2,3,4,5,6 "Built target ocean_shore"
+.PHONY : CMakeFiles/ocean_shore.dir/all
+
+# Build rule for subdir invocation for target.
+CMakeFiles/ocean_shore.dir/rule: cmake_check_build_system
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/leonfang/realTimeSoundSeparation/cmake-build-debug/CMakeFiles 6
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/ocean_shore.dir/all
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/leonfang/realTimeSoundSeparation/cmake-build-debug/CMakeFiles 0
+.PHONY : CMakeFiles/ocean_shore.dir/rule
+
+# Convenience name for target.
+ocean_shore: CMakeFiles/ocean_shore.dir/rule
+.PHONY : ocean_shore
+
+# clean rule for target.
+CMakeFiles/ocean_shore.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/clean
+.PHONY : CMakeFiles/ocean_shore.dir/clean
 
 #=============================================================================
 # Target rules for target CMakeFiles/paex_record.dir
@@ -83,7 +111,7 @@ clean: CMakeFiles/realTimeSoundSeparation.dir/clean
 CMakeFiles/paex_record.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/paex_record.dir/build.make CMakeFiles/paex_record.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/leonfang/realTimeSoundSeparation/cmake-build-debug/CMakeFiles --progress-num=1,2,3 "Built target paex_record"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/leonfang/realTimeSoundSeparation/cmake-build-debug/CMakeFiles --progress-num=7,8,9 "Built target paex_record"
 .PHONY : CMakeFiles/paex_record.dir/all
 
 # Build rule for subdir invocation for target.
@@ -109,7 +137,7 @@ CMakeFiles/paex_record.dir/clean:
 CMakeFiles/realTimeSoundSeparation.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/leonfang/realTimeSoundSeparation/cmake-build-debug/CMakeFiles --progress-num=4,5,6 "Built target realTimeSoundSeparation"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/Users/leonfang/realTimeSoundSeparation/cmake-build-debug/CMakeFiles --progress-num=10,11,12 "Built target realTimeSoundSeparation"
 .PHONY : CMakeFiles/realTimeSoundSeparation.dir/all
 
 # Build rule for subdir invocation for target.

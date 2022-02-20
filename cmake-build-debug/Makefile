@@ -117,6 +117,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named ocean_shore
+
+# Build rule for target.
+ocean_shore: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 ocean_shore
+.PHONY : ocean_shore
+
+# fast build rule for target.
+ocean_shore/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/build
+.PHONY : ocean_shore/fast
+
+#=============================================================================
 # Target rules for targets named paex_record
 
 # Build rule for target.
@@ -141,6 +154,30 @@ realTimeSoundSeparation: cmake_check_build_system
 realTimeSoundSeparation/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/build
 .PHONY : realTimeSoundSeparation/fast
+
+examples/paex_ocean_shore.o: examples/paex_ocean_shore.c.o
+.PHONY : examples/paex_ocean_shore.o
+
+# target to build an object file
+examples/paex_ocean_shore.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/examples/paex_ocean_shore.c.o
+.PHONY : examples/paex_ocean_shore.c.o
+
+examples/paex_ocean_shore.i: examples/paex_ocean_shore.c.i
+.PHONY : examples/paex_ocean_shore.i
+
+# target to preprocess a source file
+examples/paex_ocean_shore.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/examples/paex_ocean_shore.c.i
+.PHONY : examples/paex_ocean_shore.c.i
+
+examples/paex_ocean_shore.s: examples/paex_ocean_shore.c.s
+.PHONY : examples/paex_ocean_shore.s
+
+# target to generate assembly for a file
+examples/paex_ocean_shore.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/examples/paex_ocean_shore.c.s
+.PHONY : examples/paex_ocean_shore.c.s
 
 examples/paex_record.o: examples/paex_record.c.o
 .PHONY : examples/paex_record.o
@@ -190,6 +227,102 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/realTimeSoundSeparation.dir/build.make CMakeFiles/realTimeSoundSeparation.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/pa_mac_core.o: src/pa_mac_core.c.o
+.PHONY : src/pa_mac_core.o
+
+# target to build an object file
+src/pa_mac_core.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core.c.o
+.PHONY : src/pa_mac_core.c.o
+
+src/pa_mac_core.i: src/pa_mac_core.c.i
+.PHONY : src/pa_mac_core.i
+
+# target to preprocess a source file
+src/pa_mac_core.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core.c.i
+.PHONY : src/pa_mac_core.c.i
+
+src/pa_mac_core.s: src/pa_mac_core.c.s
+.PHONY : src/pa_mac_core.s
+
+# target to generate assembly for a file
+src/pa_mac_core.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core.c.s
+.PHONY : src/pa_mac_core.c.s
+
+src/pa_mac_core_blocking.o: src/pa_mac_core_blocking.c.o
+.PHONY : src/pa_mac_core_blocking.o
+
+# target to build an object file
+src/pa_mac_core_blocking.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core_blocking.c.o
+.PHONY : src/pa_mac_core_blocking.c.o
+
+src/pa_mac_core_blocking.i: src/pa_mac_core_blocking.c.i
+.PHONY : src/pa_mac_core_blocking.i
+
+# target to preprocess a source file
+src/pa_mac_core_blocking.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core_blocking.c.i
+.PHONY : src/pa_mac_core_blocking.c.i
+
+src/pa_mac_core_blocking.s: src/pa_mac_core_blocking.c.s
+.PHONY : src/pa_mac_core_blocking.s
+
+# target to generate assembly for a file
+src/pa_mac_core_blocking.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core_blocking.c.s
+.PHONY : src/pa_mac_core_blocking.c.s
+
+src/pa_mac_core_utilities.o: src/pa_mac_core_utilities.c.o
+.PHONY : src/pa_mac_core_utilities.o
+
+# target to build an object file
+src/pa_mac_core_utilities.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core_utilities.c.o
+.PHONY : src/pa_mac_core_utilities.c.o
+
+src/pa_mac_core_utilities.i: src/pa_mac_core_utilities.c.i
+.PHONY : src/pa_mac_core_utilities.i
+
+# target to preprocess a source file
+src/pa_mac_core_utilities.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core_utilities.c.i
+.PHONY : src/pa_mac_core_utilities.c.i
+
+src/pa_mac_core_utilities.s: src/pa_mac_core_utilities.c.s
+.PHONY : src/pa_mac_core_utilities.s
+
+# target to generate assembly for a file
+src/pa_mac_core_utilities.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_mac_core_utilities.c.s
+.PHONY : src/pa_mac_core_utilities.c.s
+
+src/pa_ringbuffer.o: src/pa_ringbuffer.c.o
+.PHONY : src/pa_ringbuffer.o
+
+# target to build an object file
+src/pa_ringbuffer.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_ringbuffer.c.o
+.PHONY : src/pa_ringbuffer.c.o
+
+src/pa_ringbuffer.i: src/pa_ringbuffer.c.i
+.PHONY : src/pa_ringbuffer.i
+
+# target to preprocess a source file
+src/pa_ringbuffer.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_ringbuffer.c.i
+.PHONY : src/pa_ringbuffer.c.i
+
+src/pa_ringbuffer.s: src/pa_ringbuffer.c.s
+.PHONY : src/pa_ringbuffer.s
+
+# target to generate assembly for a file
+src/pa_ringbuffer.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ocean_shore.dir/build.make CMakeFiles/ocean_shore.dir/src/pa_ringbuffer.c.s
+.PHONY : src/pa_ringbuffer.c.s
+
 src/record.o: src/record.cpp.o
 .PHONY : src/record.o
 
@@ -225,14 +358,30 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... ocean_shore"
 	@echo "... paex_record"
 	@echo "... realTimeSoundSeparation"
+	@echo "... examples/paex_ocean_shore.o"
+	@echo "... examples/paex_ocean_shore.i"
+	@echo "... examples/paex_ocean_shore.s"
 	@echo "... examples/paex_record.o"
 	@echo "... examples/paex_record.i"
 	@echo "... examples/paex_record.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/pa_mac_core.o"
+	@echo "... src/pa_mac_core.i"
+	@echo "... src/pa_mac_core.s"
+	@echo "... src/pa_mac_core_blocking.o"
+	@echo "... src/pa_mac_core_blocking.i"
+	@echo "... src/pa_mac_core_blocking.s"
+	@echo "... src/pa_mac_core_utilities.o"
+	@echo "... src/pa_mac_core_utilities.i"
+	@echo "... src/pa_mac_core_utilities.s"
+	@echo "... src/pa_ringbuffer.o"
+	@echo "... src/pa_ringbuffer.i"
+	@echo "... src/pa_ringbuffer.s"
 	@echo "... src/record.o"
 	@echo "... src/record.i"
 	@echo "... src/record.s"
