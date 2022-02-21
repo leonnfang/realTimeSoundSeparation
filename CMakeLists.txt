@@ -19,7 +19,8 @@ add_executable(ocean_shore ./examples/paex_ocean_shore.c
         include/pa_mac_core_internal.h
         include/pa_mac_core_utilities.h
 
-        src/pa_ringbuffer.c)
+        src/pa_ringbuffer.c
+        src/hostapi/pa_util.cpp)
 #link_libraries(pa_audio portaudio/lib/.libs/libportaudio.a)
 target_link_libraries(realTimeSoundSeparation libportaudio.a)
 target_link_libraries(paex_record libportaudio.a)
