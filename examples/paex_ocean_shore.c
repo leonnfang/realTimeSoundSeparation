@@ -65,6 +65,7 @@
 #include "portaudio.h"
 #include "pa_ringbuffer.h"
 #include "pa_util.h"
+#include "rnn.h"
 
 #define PINK_MAX_RANDOM_ROWS   (30)
 #define PINK_RANDOM_BITS       (24)
@@ -396,6 +397,9 @@ static float GenerateFloatRandom(float minValue, float maxValue)
 int main(void);
 int main(void)
 {
+    RNNState temp;
+    float tempNumber = 1.0f;
+    compute_rnn(&temp,&tempNumber,&tempNumber,&tempNumber);
     PaStream*           stream;
     PaError             err;
     paTestData          data = {0};

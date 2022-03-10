@@ -36,6 +36,7 @@
 #include "tansig_table.h"
 #include "nnet.h"
 #include "nnet_data.h"
+#include "rnn.h"
 #include <stdio.h>
 
 
