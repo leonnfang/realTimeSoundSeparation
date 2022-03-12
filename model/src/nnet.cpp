@@ -44,6 +44,7 @@
 #ifdef __AVX__
 #include "vec_avx.h"
 #elif __ARM_NEON__
+#include "nnet.h"
 #include "vec_neon.h"
 #else
 #warning Compiling without any vectorization. This code will be very slow
