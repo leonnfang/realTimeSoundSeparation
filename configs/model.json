@@ -1,0 +1,95 @@
+{
+  "RNNState": {
+    "RNNModel": {
+      "fc": {
+        "bias": 0,
+        "input_weights": 0,
+        "nb_inputs": 0,
+        "nb_neurons" : 0,
+        "activation": 0
+      },
+      "conv1": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "nb_inputs": 0,
+        "kernel_size": 0,
+        "nb_neurons": 0,
+        "activation": 0
+      },
+      "conv2": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "nb_inputs": 0,
+        "kernel_size": 0,
+        "nb_neurons": 0,
+        "activation": 0
+      },
+      "gru1": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "recurrent_weights": 0.0,
+        "nb_inputs": 0,
+        "nb_neurons": 0,
+        "activation": 0,
+        "reset_after" : 0
+      },
+      "gru2": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "recurrent_weights": 0.0,
+        "nb_inputs": 0,
+        "nb_neurons": 0,
+        "activation": 0,
+        "reset_after" : 0
+      },
+      "gru3": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "recurrent_weights": 0.0,
+        "nb_inputs": 0,
+        "nb_neurons": 0,
+        "activation": 0,
+        "reset_after" : 0
+      },
+      "gru_gb": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "recurrent_weights": 0.0,
+        "nb_inputs": 0,
+        "nb_neurons": 0,
+        "activation": 0,
+        "reset_after" : 0
+      },
+      "gru_rb": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "recurrent_weights": 0.0,
+        "nb_inputs": 0,
+        "nb_neurons": 0,
+        "activation": 0,
+        "reset_after" : 0
+      },
+      "fc_gb": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "nb_inputs": 0,
+        "nb_neurons": 0,
+        "activation": 0
+      },
+      "fc_rb": {
+        "bias": 0.0,
+        "input_weights": 0.0,
+        "nb_inputs": 0,
+        "nb_neurons": 0,
+        "activation": 0
+      }
+    },
+    "first_conv1d_state": 1.2,
+    "second_conv1d_state": 1.0,
+    "gru1_state": 1.0,
+    "gru2_state" : 1.0,
+    "gru3_state" : 1.0,
+    "gb_gru_state" : 1.0,
+    "rb_gru_state" : 1.0
+  }
+}
