@@ -393,6 +393,7 @@ static float GenerateFloatRandom(float minValue, float maxValue)
     return minValue + ((maxValue - minValue) * rand()) / RAND_MAX;
 }
 
+
 /*******************************************************************/
 int main(void);
 int main(void)
