@@ -44,12 +44,14 @@
 #define TEST 1
 #endif
 
-#if !TRAINING
-extern const RNNModel percepnet_model_orig;
-#endif
+//#if !TRAINING
+//extern const RNNModel percepnet_model_orig;
+//#endif
 
 int lowpass = FREQ_SIZE;
 int band_lp = NB_BANDS;
+
+int rnnoise_init(DenoiseState *st, RNNModel *model);
 
 static const opus_int16 eband5ms[] = {
 /*0  200 400 600 800  1k 1.2 1.4 1.6  2k 2.4 2.8 3.2  4k 4.8 5.6 6.8  8k 9.6 12k 15.6 20k*/
@@ -210,6 +212,28 @@ static void check_init() {
 
   common.init = 1;
 }
+int rnnoise_init(DenoiseState *st, RNNModel *model) {
+    memset(st, 0, sizeof(*st));
+
+    if (model)
+        st->rnn.model = model;
+    else
+    {
+//#if !TRAINING
+//        st->rnn.model = &percepnet_model_orig;
+//        st->rnn.first_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv1->kernel_size*st->rnn.model->conv1->nb_inputs);
+//        st->rnn.second_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv2->kernel_size*st->rnn.model->conv2->nb_inputs);
+//        st->rnn.gru1_state = (float*)calloc(sizeof(float), st->rnn.model->gru1->nb_neurons);
+//        st->rnn.gru2_state = (float*)calloc(sizeof(float), st->rnn.model->gru2->nb_neurons);
+//        st->rnn.gru3_state = (float*)calloc(sizeof(float), st->rnn.model->gru3->nb_neurons);
+//        st->rnn.gb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_gb->nb_neurons);
+//        st->rnn.rb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_rb->nb_neurons);
+//#endif
+
+    }
+
+    return 0;
+}
 
 DenoiseState *rnnoise_create(RNNModel *model) {
   DenoiseState *st;
@@ -218,28 +242,7 @@ DenoiseState *rnnoise_create(RNNModel *model) {
   return st;
 }
 
-int rnnoise_init(DenoiseState *st, RNNModel *model) {
-  memset(st, 0, sizeof(*st));
-  
-  if (model)
-    st->rnn.model = model;
-  else
-  {
-    #if !TRAINING
-    st->rnn.model = &percepnet_model_orig;
-    st->rnn.first_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv1->kernel_size*st->rnn.model->conv1->nb_inputs);
-    st->rnn.second_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv2->kernel_size*st->rnn.model->conv2->nb_inputs);
-    st->rnn.gru1_state = (float*)calloc(sizeof(float), st->rnn.model->gru1->nb_neurons);
-    st->rnn.gru2_state = (float*)calloc(sizeof(float), st->rnn.model->gru2->nb_neurons);
-    st->rnn.gru3_state = (float*)calloc(sizeof(float), st->rnn.model->gru3->nb_neurons);
-    st->rnn.gb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_gb->nb_neurons);
-    st->rnn.rb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_rb->nb_neurons);
-    #endif
 
-  }
-  
-  return 0;
-}
 
 static void apply_window(float *x) {
   int i;
@@ -555,7 +558,7 @@ static void rand_resp(float *a, float *b) {
   b[1] = .75*uni_rand();
 }
 
-int train(int argc, char **argv) {
+int main(int argc, char **argv) {
   int i;
   int count=0;
   static const float a_hp[2] = {-1.99599, 0.99600};
