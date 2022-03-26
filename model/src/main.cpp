@@ -3,17 +3,14 @@
 #include <iostream>
 #define FRAME_SIZE 480
 
-//using namespace std;
-#ifndef TRAINING
 #define TRAINING 0
-#endif
 
 int main(int argc, char **argv)
 {
-  if(TRAINING){
-    train(argc, argv);
-    return 0;
-  }
+//  if(TRAINING){
+//    train(argc, argv);
+//    return 0;
+//  }
   int i;
   int first = 1;
   float x[FRAME_SIZE];
