@@ -28,8 +28,6 @@
 #ifndef _NNET_H_
 #define _NNET_H_
 
-#include "vec.h"
-
 #define WEIGHTS_SCALE (1.f/256)
 #define MAX_NEURONS 512
 #define MAX_CONV_INPUTS 1536
@@ -44,56 +42,56 @@
 #define CONV_DIM 512
 #define CONVOUT_BUF_SIZE CONV_DIM*3
 typedef struct {
-    const float *bias;
-    const float *input_weights;
-    int nb_inputs;
-    int nb_neurons;
-    int activation;
+  const float *bias;
+  const float *input_weights;
+  int nb_inputs;
+  int nb_neurons;
+  int activation;
 } DenseLayer;
 
 typedef struct {
-    const float *bias;
-    const float *input_weights;
-    const float *factor;
-    int nb_inputs;
-    int nb_neurons;
-    int nb_channels;
-    int activation;
+  const float *bias;
+  const float *input_weights;
+  const float *factor;
+  int nb_inputs;
+  int nb_neurons;
+  int nb_channels;
+  int activation;
 } MDenseLayer;
 
 typedef struct {
-    const float *bias;
-    const float *input_weights;
-    const float *recurrent_weights;
-    int nb_inputs;
-    int nb_neurons;
-    int activation;
-    int reset_after;
+  const float *bias;
+  const float *input_weights;
+  const float *recurrent_weights;
+  int nb_inputs;
+  int nb_neurons;
+  int activation;
+  int reset_after;
 } GRULayer;
 
 typedef struct {
-    const float *bias;
-    const float *diag_weights;
-    const float *recurrent_weights;
-    const int *idx;
-    int nb_neurons;
-    int activation;
-    int reset_after;
+  const float *bias;
+  const float *diag_weights;
+  const float *recurrent_weights;
+  const int *idx;
+  int nb_neurons;
+  int activation;
+  int reset_after;
 } SparseGRULayer;
 
 typedef struct {
-    const float *bias;
-    const float *input_weights;
-    int nb_inputs;
-    int kernel_size;
-    int nb_neurons;
-    int activation;
+  const float *bias;
+  const float *input_weights;
+  int nb_inputs;
+  int kernel_size;
+  int nb_neurons;
+  int activation;
 } Conv1DLayer;
 
 typedef struct {
-    const float *embedding_weights;
-    int nb_inputs;
-    int dim;
+  const float *embedding_weights;
+  int nb_inputs;
+  int dim;
 } EmbeddingLayer;
 
 void compute_activation(float *output, float *input, int N, int activation);

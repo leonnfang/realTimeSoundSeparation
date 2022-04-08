@@ -43,12 +43,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+#include <chrono>
+#include <thread>
 #include "portaudio.h"
 
 /* #define SAMPLE_RATE  (17932) // Test failure to open with this value. */
 #define SAMPLE_RATE  (48000)
 #define FRAMES_PER_BUFFER (480)
-#define NUM_SECONDS     (5)
+#define NUM_SECONDS     (4)
 #define NUM_CHANNELS    (1)
 /* #define DITHER_FLAG     (paDitherOff) */
 #define DITHER_FLAG     (0) /**/
@@ -83,8 +86,15 @@ typedef struct {
     int frameIndex;  /* Index into sample array. */
     int maxFrameIndex;
     SAMPLE *recordedSamples;
-}
-        paTestData;
+}paTestData;
+
+typedef struct {
+    PaError paError;
+    PaStream* paStream;
+    PaStreamParameters paStreamParameters;
+    paTestData data;
+
+}threadParameters;
 
 /* This routine will be called by the PortAudio engine when audio is needed.
 ** It may be called at interrupt level on some machines so don't do anything
@@ -177,9 +187,112 @@ static int playCallback(const void *inputBuffer, void *outputBuffer,
 }
 
 /*******************************************************************/
+
+void* write(threadParameters* threadParameters1) {
+    /* Record some audio. -------------------------------------------- */
+
+    PaError err = threadParameters1->paError;
+    PaStream* stream = threadParameters1->paStream;
+    PaStreamParameters paStreamParameters = threadParameters1->paStreamParameters;
+    paTestData data = threadParameters1->data;
+    err = Pa_OpenStream(
+            &stream,
+            &paStreamParameters,
+            NULL,                  /* &outputParameters, */
+            SAMPLE_RATE,
+            FRAMES_PER_BUFFER,
+            paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+            recordCallback,
+            &data);
+    if (err != paNoError) goto done;
+
+    err = Pa_StartStream(stream);
+    if (err != paNoError) goto done;
+
+    printf("\n=== Now recording!! Please speak into the microphone. ===\n");
+    fflush(stdout);
+
+    while ((err = Pa_IsStreamActive(stream)) == 1) {
+        Pa_Sleep(1000);
+        printf("index = %d\n", data.frameIndex);
+        fflush(stdout);
+    }
+    if (err < 0) goto done;
+
+    err = Pa_CloseStream(stream);
+    if (err != paNoError) goto done;
+    printf("number of callback %d \n", timeCallback);
+
+    done:
+    Pa_Terminate();
+    if (data.recordedSamples)       /* Sure it is NULL or valid. */
+        free(data.recordedSamples);
+    if (err != paNoError) {
+        fprintf(stderr, "An error occurred while using the portaudio stream\n");
+        fprintf(stderr, "Error number: %d\n", err);
+        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
+        err = 1;          /* Always return 0 or 1, but no other return codes. */
+    }
+}
+
+void* read(threadParameters* threadParameters1) {
+
+    PaError err = threadParameters1->paError;
+    PaStream* stream = threadParameters1->paStream;
+    PaStreamParameters paStreamParameters = threadParameters1->paStreamParameters;
+    paTestData data = threadParameters1->data;
+    printf("\n=== Now playing back. ===\n");
+    fflush(stdout);
+    err = Pa_OpenStream(
+            &stream,
+            NULL, /* no input */
+            &paStreamParameters,
+            SAMPLE_RATE,
+            FRAMES_PER_BUFFER,
+            paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+            playCallback,
+            &data);
+    if (err != paNoError) goto done;
+
+    if (stream) {
+        err = Pa_StartStream(stream);
+        if (err != paNoError) goto done;
+
+        printf("Waiting for playback to finish.\n");
+        fflush(stdout);
+
+        while ((err = Pa_IsStreamActive(stream)) == 1) Pa_Sleep(100);
+        if (err < 0) goto done;
+
+        err = Pa_CloseStream(stream);
+        if (err != paNoError) goto done;
+
+        printf("Done.\n");
+        fflush(stdout);
+    }
+
+    done:
+    Pa_Terminate();
+    if (data.recordedSamples)       /* Sure it is NULL or valid. */
+        free(data.recordedSamples);
+    if (err != paNoError) {
+        fprintf(stderr, "An error occurred while using the portaudio stream\n");
+        fprintf(stderr, "Error number: %d\n", err);
+        fprintf(stderr, "Error message: %s\n", Pa_GetErrorText(err));
+        err = 1;          /* Always return 0 or 1, but no other return codes. */
+    }
+}
+
+
 int main(void);
 
 int main(void) {
+
+    pthread_t readTread;
+    pthread_t writeThread;
+    threadParameters* threadParameters1 = malloc(sizeof(threadParameters));
+    threadParameters* threadParameters2 = malloc(sizeof(threadParameters));
+
     PaStreamParameters inputParameters,
             outputParameters;
     PaStream *stream;
@@ -189,8 +302,21 @@ int main(void) {
     int totalFrames;
     int numSamples;
     int numBytes;
-    SAMPLE max, val;
-    double average;
+
+
+//    SAMPLE max, val;
+//    double average;
+
+    threadParameters1->data = data;
+    threadParameters1->paStreamParameters = inputParameters;
+    threadParameters1->paStream = stream;
+    threadParameters1->paError = err;
+
+    threadParameters2->data = data;
+    threadParameters2->paStreamParameters = outputParameters;
+    threadParameters2->paStream = stream;
+    threadParameters2->paError = err;
+
 
     printf("patest_record.c\n");
     fflush(stdout);
@@ -219,49 +345,7 @@ int main(void) {
     inputParameters.suggestedLatency = Pa_GetDeviceInfo(inputParameters.device)->defaultLowInputLatency;
     inputParameters.hostApiSpecificStreamInfo = NULL;
 
-    /* Record some audio. -------------------------------------------- */
-    err = Pa_OpenStream(
-            &stream,
-            &inputParameters,
-            NULL,                  /* &outputParameters, */
-            SAMPLE_RATE,
-            FRAMES_PER_BUFFER,
-            paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-            recordCallback,
-            &data);
-    if (err != paNoError) goto done;
 
-    err = Pa_StartStream(stream);
-    if (err != paNoError) goto done;
-    printf("\n=== Now recording!! Please speak into the microphone. ===\n");
-    fflush(stdout);
-
-    while ((err = Pa_IsStreamActive(stream)) == 1) {
-        Pa_Sleep(1000);
-        printf("index = %d\n", data.frameIndex);
-        fflush(stdout);
-    }
-    if (err < 0) goto done;
-
-    err = Pa_CloseStream(stream);
-    if (err != paNoError) goto done;
-    printf("number of callback %d \n",timeCallback);
-    /* Measure maximum peak amplitude. */
-//    max = 0;
-//    average = 0.0;
-//    for (i = 0; i < numSamples; i++) {
-//        val = data.recordedSamples[i];
-////        if( val < 0 ) val = -val; /* ABS */
-//        if (val > max) {
-//            max = val;
-//        }
-//        average += val;
-//    }
-//
-//    average = average / (double) numSamples;
-//
-//    printf("sample max amplitude = "PRINTF_S_FORMAT"\n", max);
-//    printf("sample average = %lf\n", average);
 
     /* Write recorded data to a file. */
 #if WRITE_TO_FILE
@@ -296,33 +380,40 @@ int main(void) {
 
     printf("\n=== Now playing back. ===\n");
     fflush(stdout);
-    err = Pa_OpenStream(
-            &stream,
-            NULL, /* no input */
-            &outputParameters,
-            SAMPLE_RATE,
-            FRAMES_PER_BUFFER,
-            paClipOff,      /* we won't output out of range samples so don't bother clipping them */
-            playCallback,
-            &data);
-    if (err != paNoError) goto done;
 
-    if (stream) {
-        err = Pa_StartStream(stream);
-        if (err != paNoError) goto done;
+    /* create two threads    */
+    pthread_create(&writeThread,NULL,write,threadParameters1);
 
-        printf("Waiting for playback to finish.\n");
-        fflush(stdout);
+    pthread_create(&readTread,NULL,read,threadParameters2);
 
-        while ((err = Pa_IsStreamActive(stream)) == 1) Pa_Sleep(100);
-        if (err < 0) goto done;
 
-        err = Pa_CloseStream(stream);
-        if (err != paNoError) goto done;
-
-        printf("Done.\n");
-        fflush(stdout);
-    }
+//    err = Pa_OpenStream(
+//            &stream,
+//            NULL, /* no input */
+//            &outputParameters,
+//            SAMPLE_RATE,
+//            FRAMES_PER_BUFFER,
+//            paClipOff,      /* we won't output out of range samples so don't bother clipping them */
+//            playCallback,
+//            &data);
+//    if (err != paNoError) goto done;
+//
+//    if (stream) {
+//        err = Pa_StartStream(stream);
+//        if (err != paNoError) goto done;
+//
+//        printf("Waiting for playback to finish.\n");
+//        fflush(stdout);
+//
+//        while ((err = Pa_IsStreamActive(stream)) == 1) Pa_Sleep(100);
+//        if (err < 0) goto done;
+//
+//        err = Pa_CloseStream(stream);
+//        if (err != paNoError) goto done;
+//
+//        printf("Done.\n");
+//        fflush(stdout);
+//    }
 
     done:
     Pa_Terminate();

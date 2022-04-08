@@ -38,20 +38,20 @@
 #define NB_DELTA_CEPS 6
 
 #define NB_FEATURES (NB_BANDS*2+2)
-#define NORM_RATIO 32768
+#define NORM_RATIO 1
+
+#define ENVELOPE_POSTFILTERING_BETA 0.02f
 
 #ifndef TEST
 #define TEST 1
 #endif
 
-//#if !TRAINING
-//extern const RNNModel percepnet_model_orig;
-//#endif
+#if !TRAINING
+extern const RNNModel percepnet_model_orig;
+#endif
 
 int lowpass = FREQ_SIZE;
 int band_lp = NB_BANDS;
-
-int rnnoise_init(DenoiseState *st, RNNModel *model);
 
 static const opus_int16 eband5ms[] = {
 /*0  200 400 600 800  1k 1.2 1.4 1.6  2k 2.4 2.8 3.2  4k 4.8 5.6 6.8  8k 9.6 12k 15.6 20k*/
@@ -118,7 +118,7 @@ void compute_band_energy(float *bandE, const kiss_fft_cpx *X) {
   sum[NB_BANDS-1] *= 2;
   for (i=0;i<NB_BANDS;i++)
   {
-    bandE[i] = sqrt(sum[i]);
+    bandE[i] = sum[i];
   }
 }
 
@@ -212,27 +212,41 @@ static void check_init() {
 
   common.init = 1;
 }
-int rnnoise_init(DenoiseState *st, RNNModel *model) {
-    memset(st, 0, sizeof(*st));
 
-    if (model)
-        st->rnn.model = model;
-    else
-    {
-//#if !TRAINING
-//        st->rnn.model = &percepnet_model_orig;
-//        st->rnn.first_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv1->kernel_size*st->rnn.model->conv1->nb_inputs);
-//        st->rnn.second_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv2->kernel_size*st->rnn.model->conv2->nb_inputs);
-//        st->rnn.gru1_state = (float*)calloc(sizeof(float), st->rnn.model->gru1->nb_neurons);
-//        st->rnn.gru2_state = (float*)calloc(sizeof(float), st->rnn.model->gru2->nb_neurons);
-//        st->rnn.gru3_state = (float*)calloc(sizeof(float), st->rnn.model->gru3->nb_neurons);
-//        st->rnn.gb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_gb->nb_neurons);
-//        st->rnn.rb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_rb->nb_neurons);
-//#endif
+static void post_filtering(float* g, const float* Ey) {
+    // Envelope Postfiltering
+    int i = 0;
+    float E0 = 0;
+    float E1 = 0;
+    float E_div = 0;
+    float g_w[NB_BANDS] = { 0 };
+    float G = 0.0f;
 
+    // warped gain
+    for (i = 0; i<NB_BANDS; i++) {
+      g_w[i] = g[i]*sinf(M_PI/2*g[i]);
     }
 
-    return 0;
+    // total energy of the enhanced signal
+    for (i = 0; i<NB_BANDS; i++) {
+      E0 += g[i]*Ey[i];
+    }
+
+    // total energy when using the warped gain
+    for (i = 0; i<NB_BANDS; i++) {
+      E1 += g_w[i]*Ey[i];
+    }
+
+    // global gain compensation heuristic
+    E_div = E0/(E1+1e-6f);
+    G = sqrtf(
+          ((1+ENVELOPE_POSTFILTERING_BETA)*E_div)/(1+ENVELOPE_POSTFILTERING_BETA*(E_div*E_div))
+        );
+
+    // Scaling the final signal for the frame by G
+    for (i = 0; i<NB_BANDS; i++) {
+      g[i] = G*g_w[i];
+    }
 }
 
 DenoiseState *rnnoise_create(RNNModel *model) {
@@ -242,7 +256,29 @@ DenoiseState *rnnoise_create(RNNModel *model) {
   return st;
 }
 
+int rnnoise_init(DenoiseState *st, RNNModel *model) {
+  memset(st, 0, sizeof(*st));
+  
+  if (model)
+    st->rnn.model = model;
+  else
+  {
+    #if !TRAINING
+    st->rnn.model = &percepnet_model_orig;
+    // std::cout << *(percepnet_model_orig.fc->input_weights) << std::endl;
+    st->rnn.first_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv1->kernel_size*st->rnn.model->conv1->nb_inputs);
+    st->rnn.second_conv1d_state = (float*)calloc(sizeof(float), st->rnn.model->conv2->kernel_size*st->rnn.model->conv2->nb_inputs);
+    st->rnn.gru1_state = (float*)calloc(sizeof(float), st->rnn.model->gru1->nb_neurons);
+    st->rnn.gru2_state = (float*)calloc(sizeof(float), st->rnn.model->gru2->nb_neurons);
+    st->rnn.gru3_state = (float*)calloc(sizeof(float), st->rnn.model->gru3->nb_neurons);
+    st->rnn.gb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_gb->nb_neurons);
+    st->rnn.rb_gru_state = (float*)calloc(sizeof(float), st->rnn.model->gru_rb->nb_neurons);
+    #endif
 
+  }
+  
+  return 0;
+}
 
 static void apply_window(float *x) {
   int i;
@@ -452,6 +488,10 @@ void pitch_filter(kiss_fft_cpx *X, const kiss_fft_cpx *P, const float *Ex, const
 static void create_features(float* Ey_lookahead, float* pitch_coh, float T, float pitchcorr, float* features){
   RNN_COPY(&features[0], Ey_lookahead, NB_BANDS);
   RNN_COPY(&features[NB_BANDS], pitch_coh, NB_BANDS);
+  //normalize
+  for(int i=0; i<68; i++){
+    features[i] = features[i]*30;
+  }
   features[68] = T;
   features[69] = pitchcorr;
 }
@@ -466,7 +506,7 @@ static void compute_lookahead_band_energy(DenoiseState *st, float *Ey_ahead){
   compute_band_energy(Ey_ahead, Y);
 }
 
-float rnnoise_process_frame(DenoiseState *st, float *out, const float *in) {
+float rnnoise_process_frame(DenoiseState *st, float *out, const float *in, FILE* f_feature) {
   int i;
   kiss_fft_cpx X[FREQ_SIZE];
   kiss_fft_cpx P[WINDOW_SIZE];
@@ -483,13 +523,16 @@ float rnnoise_process_frame(DenoiseState *st, float *out, const float *in) {
   //static const float a_hp[2] = {-1.99599, 0.99600};
   //static const float b_hp[2] = {-2, 1};
   //biquad(x, st->mem_hp_x, in, b_hp, a_hp, FRAME_SIZE);
-  silence = compute_frame_features(st, X, P, Ex, Ep, Exp, features, x);
+  silence = compute_frame_features(st, X, P, Ex, Ep, Exp, features, in);
 
   compute_lookahead_band_energy(st,Ex_lookahead);
-  float T = st->last_period/(PITCH_MAX_PERIOD-3*PITCH_MIN_PERIOD);
+  float T = (float)st->last_period/(PITCH_MAX_PERIOD-3*PITCH_MIN_PERIOD);
   float pitchcorr = st->pitch_corr;
   create_features(Ex_lookahead,Exp,T,pitchcorr,features);
+  
   compute_rnn(&st->rnn,g,r,features);
+  fwrite(g, sizeof(float), 34, f_feature);
+  fwrite(r, sizeof(float), 34, f_feature);
   //r will be estimated by dnn
   if(!silence){
   pitch_filter(X, P, Ex, Ep, Exp, g, r);
@@ -540,7 +583,7 @@ void adjust_gain_strength_by_condition(CommonState st, float *Ephatp, float *Exp
     if(Ephatp[i]<Exp[i])
     {
       g_att = sqrt((1+st.n0-Exp[i]*Exp[i])/(1+st.n0-Ephatp[i]*Ephatp[i]));
-      r[i] = 1;
+      r[i] = 0.99;
       g[i] *= g_att;
     }
   }
@@ -558,7 +601,7 @@ static void rand_resp(float *a, float *b) {
   b[1] = .75*uni_rand();
 }
 
-int main(int argc, char **argv) {
+int train(int argc, char **argv) {
   int i;
   int count=0;
   static const float a_hp[2] = {-1.99599, 0.99600};
@@ -593,7 +636,7 @@ int main(int argc, char **argv) {
   noise_state = rnnoise_create(NULL);
   noisy = rnnoise_create(NULL);
   if (argc!=5) {
-    fprintf(stderr, "usage: %s <speech> <noise> <count> <output>\n", argv[0]);
+    fprintf(stderr, "usage: %s <speech> <noisy> <count> <output>\n", argv[0]);
     return 1;
   }
   f1 = fopen(argv[1], "rb");
@@ -604,10 +647,10 @@ int main(int argc, char **argv) {
   f5 = fopen("test_input.pcm","wb");
   #endif
   maxCount = atoi(argv[3]);
-  for(i=0;i<150;i++) {
-    short tmp[FRAME_SIZE];
-    fread(tmp, sizeof(short), FRAME_SIZE, f2);
-  }
+  //for(i=0;i<150;i++) {
+  //  short tmp[FRAME_SIZE];
+  //  fread(tmp, sizeof(short), FRAME_SIZE, f2);
+  //}
   while (1) {
     kiss_fft_cpx X[FREQ_SIZE], Y[FREQ_SIZE], N[FREQ_SIZE], P[FREQ_SIZE];
     kiss_fft_cpx Phat[FREQ_SIZE];/*only for build*/
@@ -624,6 +667,10 @@ int main(int argc, char **argv) {
     float E=0;
     if (count==maxCount) break;
     //if ((count%1000)==0) fprintf(stderr, "%d\r", count);
+
+    //DNS-Challenge Dataset can generate clean&noise data accroding to SNR,RIR setting
+    //Disable gain change & Ignore lowpass filtering for convenience
+    /*
     if (++gain_change_count > 2821) {
       speech_gain = pow(10., (-40+(rand()%60))/20.);
       noise_gain = pow(10., (-30+(rand()%50))/20.);
@@ -641,13 +688,14 @@ int main(int argc, char **argv) {
         }
       }
     }
+    */
     if (speech_gain != 0) {
       fread(tmp, sizeof(short), FRAME_SIZE, f1);
       if (feof(f1)) {
         rewind(f1);
         fread(tmp, sizeof(short), FRAME_SIZE, f1);
       }
-      for (i=0;i<FRAME_SIZE;i++) norm_tmp[i] = (float)tmp[i]/NORM_RATIO;
+      for (i=0;i<FRAME_SIZE;i++) norm_tmp[i] = ((float)tmp[i])/NORM_RATIO;
       for (i=0;i<FRAME_SIZE;i++) x[i] = speech_gain*norm_tmp[i];
       for (i=0;i<FRAME_SIZE;i++) E += norm_tmp[i]*(float)norm_tmp[i];
     } else {
@@ -660,20 +708,22 @@ int main(int argc, char **argv) {
         rewind(f2);
         fread(tmp, sizeof(short), FRAME_SIZE, f2);
       }
-      for (i=0;i<FRAME_SIZE;i++) norm_tmp[i] = (float)tmp[i]/NORM_RATIO;
+      for (i=0;i<FRAME_SIZE;i++) norm_tmp[i] = ((float)tmp[i])/NORM_RATIO;
       for (i=0;i<FRAME_SIZE;i++) n[i] = noise_gain*norm_tmp[i];
     } else {
       for (i=0;i<FRAME_SIZE;i++) n[i] = 0;
     }
-    biquad(x, mem_hp_x, x, b_hp, a_hp, FRAME_SIZE);
-    biquad(x, mem_resp_x, x, b_sig, a_sig, FRAME_SIZE);
-    biquad(n, mem_hp_n, n, b_hp, a_hp, FRAME_SIZE);
-    biquad(n, mem_resp_n, n, b_noise, a_noise, FRAME_SIZE);
-    for (i=0;i<FRAME_SIZE;i++) xn[i] = x[i] + n[i];
+    // biquad(x, mem_hp_x, x, b_hp, a_hp, FRAME_SIZE);
+    // biquad(x, mem_resp_x, x, b_sig, a_sig, FRAME_SIZE);
+    // biquad(n, mem_hp_n, n, b_hp, a_hp, FRAME_SIZE);
+    // biquad(n, mem_resp_n, n, b_noise, a_noise, FRAME_SIZE);
+    //for (i=0;i<FRAME_SIZE;i++) xn[i] = x[i] + n[i];
+    // DNS challenge data is already mixed
+    for (i=0;i<FRAME_SIZE;i++) xn[i] = n[i];
     #ifdef TEST
     for(int i=0; i<FRAME_SIZE; i++){
       out_short[i] = (short)fmax(-32768,fmin(32767, xn[i]*NORM_RATIO));
-      xn[i] = (float)out_short[i]/NORM_RATIO;
+      //xn[i] = (float)out_short[i]/NORM_RATIO;
     }
     
     fwrite(out_short, sizeof(short), FRAME_SIZE, f5);
@@ -684,29 +734,29 @@ int main(int argc, char **argv) {
     int silence = compute_frame_features(noisy, Y, Phat/*only use for Test*/, Ey, Ephat/*only use for Test*/, Ephaty, features, xn);
     compute_frame_features(st, X, P, Ex, Ep, Exp, features, x);
     calc_ideal_gain(Ex, Ey, g);
-    //compute_band_corr(Eyp, Y, P);
-    //for (i=0;i<NB_BANDS;i++) Eyp[i] = fmin(1,fmax(0,Eyp[i]/sqrt(.001+Ey[i]*Ep[i])));
+    compute_band_corr(Eyp, Y, P);
+    for (i=0;i<NB_BANDS;i++) Eyp[i] = fmin(1,fmax(0,Eyp[i]/sqrt(.001+Ey[i]*Ep[i])));
     estimate_phat_corr(common, Ephaty, Ephatp);
     filter_strength_calc(Exp, Ephaty, Ephatp, r);
     adjust_gain_strength_by_condition(common, Ephatp, Exp, g, r);
     
     #ifdef TEST
-    
-    if(!silence){
-    pitch_filter(Y, Phat, Ey, Ephat, Ephaty, g, r);
-    }
-    interp_band_gain(gf, g);
-    
-    for (i=0;i<FREQ_SIZE;i++) {
-      Y[i].r *= gf[i];
-      Y[i].i *= gf[i];
-    }
-    
-    frame_synthesis(st, out, Y);
-    for(int i=0; i<FRAME_SIZE; i++){
-      out_short[i] = (short)fmax(-32768,fmin(32767, out[i]*NORM_RATIO));
-    }
-    fwrite(out_short, sizeof(short), FRAME_SIZE, f4);
+      post_filtering(g, Ey);
+      if(!silence){
+      pitch_filter(Y, Phat, Ey, Ephat, Ephaty, g, r);
+      }
+      interp_band_gain(gf, g);
+      
+      for (i=0;i<FREQ_SIZE;i++) {
+        Y[i].r *= gf[i];
+        Y[i].i *= gf[i];
+      }
+      
+      frame_synthesis(st, out, Y);
+      for(int i=0; i<FRAME_SIZE; i++){
+        out_short[i] = (short)fmax(-32768,fmin(32767, out[i]*NORM_RATIO));
+      }
+      fwrite(out_short, sizeof(short), FRAME_SIZE, f4);
     #endif
 
     compute_lookahead_band_energy(noisy,Ey_lookahead);
@@ -715,7 +765,7 @@ int main(int argc, char **argv) {
     fwrite(Ey_lookahead, sizeof(float), NB_BANDS, f3);//Y(l+M)
     fwrite(Ephaty, sizeof(float), NB_BANDS, f3);//pitch coherence
     
-    float T = noisy->last_period/(PITCH_MAX_PERIOD-3*PITCH_MIN_PERIOD);
+    float T = (float)noisy->last_period/(PITCH_MAX_PERIOD-3*PITCH_MIN_PERIOD);
     float pitchcorr = noisy->pitch_corr;
     fwrite(&T, sizeof(float), 1, f3);//pitch
     fwrite(&pitchcorr, sizeof(float), 1, f3);//pitch correlation
