@@ -10,8 +10,11 @@ link_directories(/usr/local/lib)
 #link_directories(src/common)
 #link_directories(model)
 
-set(model_src_file)
-set(model_header_file model/rnnoise.h)
+set(model_src_file model/celt_lpc.cpp model/denoise.cpp model/kiss_fft.cpp model/nnet.cpp
+        model/pitch.cpp model/rnn.cpp model/separate.cpp)
+set(model_header_file model/rnnoise.h model/arch.h model/celt_lpc.h model/common.h
+        model/erbband.h model/kiss_fft.h model/nnet.h model/pitch.h model/rnnoise.h
+        model/separate.h model/nnet_data.h model/vec.h)
 
 add_executable(realTimeSoundSeparation
         include/record.h
@@ -34,7 +37,7 @@ add_executable(ringbuffer
         src/hostapi/pa_util.cpp
         examples/paex_record_file.c)
 
-add_executable(wire examples/patest_wire.cpp)
+add_executable(wire examples/patest_wire.cpp ${model_src_file} ${model_header_file})
 
 #link_libraries(pa_audio portaudio/lib/.libs/libportaudio.a)
 target_link_libraries(realTimeSoundSeparation libportaudio.a)
