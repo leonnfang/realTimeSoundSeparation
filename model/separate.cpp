@@ -1,9 +1,7 @@
 
 #include "separate.h"
 
-#ifndef TRAINING
 #define TRAINING 0
-#endif
 
 int separate(short *input, short *output, DenoiseState *st)
 {

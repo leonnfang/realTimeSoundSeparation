@@ -46,9 +46,8 @@
 #define TEST 1
 #endif
 
-#if !TRAINING
 extern const RNNModel percepnet_model_orig;
-#endif
+
 
 int lowpass = FREQ_SIZE;
 int band_lp = NB_BANDS;

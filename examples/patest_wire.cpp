@@ -20,7 +20,7 @@
 #include "portaudio.h"
 #include "separate.h"
 
-#define SAMPLE_RATE            (44100)
+#define SAMPLE_RATE            (48000)
 
 typedef struct WireConfig_s {
     int isInputInterleaved;
@@ -66,7 +66,7 @@ double gInOutScaler = 1.0;
 
 INPUT_SAMPLE tmpInput[480];
 OUTPUT_SAMPLE tmpOutput[480];
-int inputIndex = 0;
+//int inputIndex = 0;
 DenoiseState* st = rnnoise_create(NULL);
 
 static PaError TestConfiguration(WireConfig_t *config);
@@ -128,19 +128,19 @@ static int wireCallback(const void *inputBuffer, void *outputBuffer,
 //        int
         for( i=0; i<framesPerBuffer; i++ )
         {
-            // keep pushing to the denoising array
             tmpInput[i] = in[i];
         }
 
         //denoise here
-//        separate(tmpInput, out, st);
+        separate(tmpInput, tmpOutput, st);
 
         // copy the denoised sound to the output buffer
         for(int i = 0; i < framesPerBuffer; i++){
-            out[i] = tmpInput[i];
+            out[i] = tmpOutput[i];
         }
-        inputIndex = inputIndex == 480 ? 0 : inputIndex;
-        printf("----------------------------------------\n");
+
+//        inputIndex = inputIndex == 480 ? 0 : inputIndex;
+//        printf("----------------------------------------\n");
 
 
         if (inChannel < (config->numInputChannels - 1)) inChannel++;

@@ -11,7 +11,7 @@ link_directories(/usr/local/lib)
 #link_directories(model)
 
 set(model_src_file model/celt_lpc.cpp model/denoise.cpp model/kiss_fft.cpp model/nnet.cpp
-        model/pitch.cpp model/rnn.cpp model/separate.cpp)
+        model/pitch.cpp model/rnn.cpp model/separate.cpp model/nnet_data.cpp)
 set(model_header_file model/rnnoise.h model/arch.h model/celt_lpc.h model/common.h
         model/erbband.h model/kiss_fft.h model/nnet.h model/pitch.h model/rnnoise.h
         model/separate.h model/nnet_data.h model/vec.h)
